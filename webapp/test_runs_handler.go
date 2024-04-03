@@ -40,7 +40,8 @@ func parseTestRunsUIFilter(r *http.Request) (filter testRunUIFilter, err error) 
 		return filter, err
 	}
 
-	isDefault := testRunFilter.IsDefaultQuery() && pr == nil
+	// isDefault := testRunFilter.IsDefaultQuery() && pr == nil
+	isDefault := false
 	if isDefault {
 		// Get runs from a week ago, onward, by default.
 		aWeekAgo := time.Now().Truncate(time.Hour*24).AddDate(0, 0, -7)

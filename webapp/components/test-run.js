@@ -73,7 +73,10 @@ class TestRun extends WPTFlags(ProductInfo(PolymerElement)) {
             </a>
           </template>
           <template is="dom-if" if="[[!githubCommitLinks]]">
-            <div class="revision">@<a href="?sha={{testRun.revision}}">{{testRun.revision}}</a></div>
+            <a class="github" href="https://github.com/web-platform-tests/wpt/commit/[[testRun.revision]]">
+              <img src="/static/github.svg" alt="GitHub logo">
+              [[sevenCharSHA(testRun.revision)]]
+            </a>
           </template>
           <div>{{dateFormat(testRun.time_start)}}</div>
         </template>

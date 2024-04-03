@@ -81,6 +81,27 @@ func main() {
 	chromeExp.Labels = []string{"chrome", shared.ExperimentalLabel}
 	chromeExp.ResultsURL = strings.Replace(chrome.ResultsURL, "[stable]", "[experimental]", -1)
 
+	chrome_android := shared.TestRun{
+		ProductAtRevision: shared.ProductAtRevision{
+			Product: shared.Product{
+				BrowserName:    "chrome_android",
+				BrowserVersion: "74.0",
+				OSName:         "android",
+				OSVersion:      "9",
+			},
+			FullRevisionHash: staticRunSHA,
+			Revision:         staticRunSHA[:10],
+		},
+		ResultsURL: fmt.Sprintf(summaryURLFmtString, *localHost, staticRunSHA[:10], "chrome_android[stable]-summary_v2.json.gz"),
+		CreatedAt:  staticDataTime,
+		TimeStart:  staticDataTime,
+		Labels:     []string{"chrome_android", shared.StableLabel},
+	}
+	chrome_androidExp := chrome
+	chrome_androidExp.BrowserVersion = "76.0"
+	chrome_androidExp.Labels = []string{"chrome", shared.ExperimentalLabel}
+	chrome_androidExp.ResultsURL = strings.Replace(chrome_android.ResultsURL, "[stable]", "[experimental]", -1)
+
 	edge := chrome
 	edge.BrowserName = "edge"
 	edge.BrowserVersion = "18"
@@ -116,15 +137,32 @@ func main() {
 	safariExp.Labels = []string{"safari", shared.ExperimentalLabel}
 	safariExp.ResultsURL = strings.Replace(safari.ResultsURL, "[stable]", "[experimental]", -1)
 
+	huawei_browser := chrome
+	huawei_browser.BrowserName = "huawei_browser"
+	huawei_browser.BrowserVersion = "Beta"
+	huawei_browser.OSName = "openharmony"
+	huawei_browser.OSName = "3.2.3"
+	huawei_browser.ResultsURL = fmt.Sprintf(summaryURLFmtString, *localHost, staticRunSHA[:10], "huawei_browser[stable]-summary_v2.json.gz")
+	huawei_browser.Labels = []string{"huawei browser", shared.StableLabel}
+	huawei_browserExp := huawei_browser
+	huawei_browserExp.BrowserVersion = "Beta"
+	huawei_browserExp.Labels = []string{"huawei_browser", shared.ExperimentalLabel}
+	huawei_browserExp.ResultsURL = strings.Replace(huawei_browser.ResultsURL, "[stable]", "[experimental]", -1)
+
+
 	staticTestRuns := shared.TestRuns{
 		chrome,
 		chromeExp,
-		edge,
-		edgeExp,
+		chrome_android,
+		chrome_androidExp,
 		firefox,
 		firefoxExp,
 		safari,
 		safariExp,
+		huawei_browser,
+		huawei_browserExp,
+		edge,
+		edgeExp,
 	}
 	labelRuns(staticTestRuns, "test", "static", shared.MasterLabel)
 
@@ -185,7 +223,7 @@ func main() {
 			labels := run.LabelsSet()
 			if labels.Contains(shared.StableLabel) {
 				stableRuns = append(stableRuns, run)
-			} else if labels.Contains("edge") || labels.Contains(shared.ExperimentalLabel) {
+			} else if labels.Contains("huawei_browser") || labels.Contains(shared.ExperimentalLabel) {
 				defaultRuns = append(defaultRuns, run)
 			}
 		}
@@ -227,9 +265,9 @@ func main() {
 		filters.Labels = extraLabels.Union(mapset.NewSetWith(shared.BetaLabel))
 		copyProdRuns(store, filters)
 
-		log.Print("Adding latest aligned Edge stable and Chrome/Firefox/Safari experimental data...")
+		log.Print("Adding latest aligned Chrome/Chrome Android/Firefox/Safari/Huawei Browser experimental data...")
 		filters.Labels = extraLabels.Union(mapset.NewSet(shared.MasterLabel))
-		filters.Products, _ = shared.ParseProductSpecs("chrome[experimental]", "edge[stable]", "firefox[experimental]", "safari[experimental]")
+		filters.Products, _ = shared.ParseProductSpecs("chrome[experimental]", "chrome_android[experimental]", "firefox[experimental]", "safari[experimental]","huawei_browser[experimental]")
 		copyProdRuns(store, filters)
 
 		log.Printf("Successfully copied a total of %v distinct TestRuns", seenTestRunIDs.Cardinality())

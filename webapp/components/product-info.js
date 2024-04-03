@@ -6,9 +6,9 @@
 const DisplayNames = (() => {
   let m = new Map();
   ['chrome', 'chrome-experimental'].forEach(n => m.set(n, 'Chrome'));
-  ['edge', 'edge-experimental'].forEach(n => m.set(n, 'Edge'));
   ['firefox', 'firefox-experimental'].forEach(n => m.set(n, 'Firefox'));
   ['safari', 'safari-experimental'].forEach(n => m.set(n, 'Safari'));
+  ['huawei_browser', 'huawei_browser-experimental'].forEach(n => m.set(n, 'Huawei Browser'));
   m.set('android_webview', 'WebView');
   m.set('chrome_android', 'ChromeAndroid');
   m.set('chrome_ios', 'ChromeIOS');
@@ -21,11 +21,13 @@ const DisplayNames = (() => {
   m.set('uc', 'UC Browser');
   m.set('wktr', 'macOS WebKit');
   m.set('webkitgtk', 'WebKitGTK');
+  m.set('edge', 'Edge');
   // Platforms
   m.set('android', 'Android');
   m.set('linux', 'Linux');
   m.set('mac', 'macOS');
   m.set('win', 'Windows');
+  m.set('openharmony', 'OpenHarmony');
   // Channels
   m.set('stable', 'Stable');
   m.set('beta', 'Beta');
@@ -48,12 +50,12 @@ const versionPatterns = Object.freeze({
 
 // The set of all browsers known to the wpt.fyi UI.
 const AllBrowserNames = Object.freeze(['android_webview', 'chrome_android', 'chrome_ios', 'chrome',
-  'chromium', 'deno', 'edge', 'firefox_android', 'firefox', 'flow', 'node.js', 'safari', 'servo', 'webkitgtk', 'wktr']);
+  'chromium', 'deno', 'edge', 'firefox_android', 'firefox', 'flow', 'node.js', 'huawei_browser', 'safari', 'servo', 'webkitgtk', 'wktr']);
 
 // The list of default browsers used in cases where the user has not otherwise
 // chosen a set of browsers (e.g. which browsers to show runs for). Stored as
 // an ordered list so that the first entry can be used as a consistent default.
-const DefaultBrowserNames = Object.freeze(['chrome', 'edge', 'firefox', 'safari']);
+const DefaultBrowserNames = Object.freeze(['chrome', 'chrome_android', 'edge', 'firefox', 'huawei_browser', 'safari']);
 const DefaultProductSpecs = DefaultBrowserNames;
 
 // The above sets, encoded as product objects. This avoids repeatedly calling
@@ -64,7 +66,7 @@ const DefaultProducts = DefaultProductSpecs.map(p => Object.freeze(parseProductS
 const CommitTypes = new Set(['pr_head', 'master']);
 const Channels = new Set(['stable', 'beta', 'experimental']);
 const Sources = new Set(['buildbot', 'taskcluster', 'msedge', 'azure']);
-const Platforms = new Set(['linux', 'win', 'mac', 'ios', 'android']);
+const Platforms = new Set(['linux', 'win', 'mac', 'ios', 'android', 'openharmony']);
 const SemanticLabels = [
   { property: '_channel', values: Channels },
   { property: '_source', values: Sources },
@@ -182,7 +184,7 @@ const ProductInfo = (superClass) => class extends superClass {
       // although it would be better to have some variant of the Firefox logo.
       return '/static/geckoview_64x64.png';
 
-    } else if (name !== 'chromium' && name !== 'deno' && name !== 'flow' && name !== 'node.js' && name !== 'servo' && name !== 'wktr') {  // Products without per-channel logos.
+    } else if (name !== 'chromium' && name !== 'deno' && name !== 'flow' && name !== 'node.js' && name !== 'servo' && name !== 'wktr' && name !== 'huawei_browser') {  // Products without per-channel logos.
       let channel;
       const candidates = ['beta', 'dev', 'canary', 'nightly', 'preview'];
       for (const label of candidates) {
@@ -206,7 +208,7 @@ const ProductInfo = (superClass) => class extends superClass {
   }
 
   minorIsSignificant(browserName) {
-    return browserName === 'deno' || browserName === 'flow' || browserName === 'safari' || browserName === 'webkitgtk';
+    return browserName === 'deno' || browserName === 'flow' || browserName === 'safari' || browserName === 'webkitgtk' || browserName === 'huawei_browser';
   }
 
   /**
